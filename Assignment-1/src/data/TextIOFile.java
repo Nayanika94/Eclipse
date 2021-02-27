@@ -3,7 +3,6 @@ package data;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Scanner;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -19,16 +18,44 @@ public class TextIOFile {
 	}
 		
 	public static  Object[] findAll() throws IOException{
-		Scanner scanner=new Scanner(myFile);
-	ArrayList<String> records=new ArrayList<String>();
-	while(scanner.hasNext()) {
+	
+		Scanner scanner = new Scanner(myFile);
+		ArrayList<String> records=new ArrayList<String>();
+		while(scanner.hasNext()) {
 		String record =scanner.nextLine();
 		records.add(record);
-	}
-	scanner.close();
-	return records.toArray();
+		}
+		scanner.close();
+		return records.toArray();
 	}
 	
+	public static Object[] findCity(String city) throws IOException{
+		
+		Scanner scanner = new Scanner(myFile);
+		ArrayList<String> records=new ArrayList<String>();
+		while(scanner.hasNext()) {
+			String record =scanner.nextLine();
+			String[] fields = record.split(",");
+			if(fields[1].contains(city))
+				records.add(record);
+			}
+		scanner.close();
+		return records.toArray();	
+	}
+	
+    public static Object[] findDate(String date) throws IOException{
+		
+		Scanner scanner = new Scanner(myFile);
+		ArrayList<String> records=new ArrayList<String>();
+		while(scanner.hasNext()) {
+			String record = scanner.nextLine();
+			String[] fields = record.split(",");
+			if(fields[0].equals(date))			
+			    records.add(record);
+			}
+		scanner.close();
+		return records.toArray();	
+	}
 	
 }
 

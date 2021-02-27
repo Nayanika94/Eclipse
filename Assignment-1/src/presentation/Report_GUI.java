@@ -1,28 +1,36 @@
 package presentation;
 
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import java.awt.Font;
 import javax.swing.JRadioButton;
-import com.toedter.calendar.JDayChooser;
+import data.TextIOFile;
 import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.awt.event.ActionEvent;
-import javax.swing.JTextField;
 import com.toedter.calendar.JDateChooser;
 import javax.swing.ButtonGroup;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.UIManager;
 
 
 public class Report_GUI extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 
@@ -46,6 +54,7 @@ public class Report_GUI extends JFrame {
 	 * Create the frame.
 	 */
 	public Report_GUI() {
+		setResizable(false);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle("Reporting");
 		setBounds(100, 100, 682, 347);
@@ -53,59 +62,142 @@ public class Report_GUI extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		
+
 		JRadioButton rdbtnAll = new JRadioButton("All");
 		rdbtnAll.setSelected(true);
 		buttonGroup.add(rdbtnAll);
 		rdbtnAll.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		rdbtnAll.setBounds(37, 50, 103, 21);
 		contentPane.add(rdbtnAll);
-		
-		JRadioButton rdbtnCity = new JRadioButton("City");
-		buttonGroup.add(rdbtnCity);
-		rdbtnCity.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		rdbtnCity.setBounds(37, 83, 103, 21);
-		contentPane.add(rdbtnCity);
-		
-		JRadioButton rdbtnDate = new JRadioButton("Date");
-		buttonGroup.add(rdbtnDate);
-		rdbtnDate.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		rdbtnDate.setBounds(37, 148, 103, 21);
-		contentPane.add(rdbtnDate);
-		
-		JLabel lblNewLabel = new JLabel("Categories :-");
-		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		lblNewLabel.setBounds(37, 20, 150, 24);
-		contentPane.add(lblNewLabel);
-		
-		JTextArea textArea = new JTextArea();
-		textArea.setBounds(368, 28, 276, 256);
-		contentPane.add(textArea);
-		
+
 		String[] choices = {"Select","Brampton", "Toronto", "Mississauga","Kitchener","Oakville","Cambridge"};
-		JComboBox cmboxDate = new JComboBox(choices);
-		cmboxDate.setEnabled(false);
-		cmboxDate.setBounds(37, 115, 132, 27);
-		contentPane.add(cmboxDate);
-		
+		JComboBox<String> cmboxCity = new JComboBox<String>(choices);
+		cmboxCity.setBackground(UIManager.getColor("Button.background"));
+		cmboxCity.setEnabled(false);
+		cmboxCity.setBounds(37, 115, 132, 27);
+		contentPane.add(cmboxCity);
+
 		JDateChooser datePicker = new JDateChooser();
 		datePicker.setDateFormatString("MM/dd/yyyy");
-		datePicker.setEnabled(false);
+		
 		datePicker.getCalendarButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
 		datePicker.setBounds(37, 184, 134, 27);
 		contentPane.add(datePicker);
-		
+
+		JRadioButton rdbtnDate = new JRadioButton("Date");
+		datePicker.setEnabled(false);
+		rdbtnDate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(rdbtnDate.isSelected()) {
+					datePicker.setEnabled(true);
+				}
+			}
+		});
+		buttonGroup.add(rdbtnDate);
+		rdbtnDate.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		rdbtnDate.setBounds(37, 148, 103, 21);
+		contentPane.add(rdbtnDate);
+
+		JRadioButton rdbtnCity = new JRadioButton("City");
+		cmboxCity.setEnabled(false);
+		rdbtnCity.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(rdbtnCity.isSelected()) {
+					cmboxCity.setEnabled(true);
+				}
+			}
+		});
+		buttonGroup.add(rdbtnCity);
+		rdbtnCity.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		rdbtnCity.setBounds(37, 83, 103, 21);
+		contentPane.add(rdbtnCity);
+
+		JLabel lblNewLabel = new JLabel("Categories :-");
+		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		lblNewLabel.setBounds(37, 20, 150, 24);
+		contentPane.add(lblNewLabel);
+
+		JTextArea textArea = new JTextArea();
+		textArea.setBounds(368, 28, 276, 256);
+		contentPane.add(textArea);
+
 		JButton btnGenerateReport = new JButton("Generate Report");
+		btnGenerateReport.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+			}
+		});
 		btnGenerateReport.setFont(new Font("Tahoma", Font.BOLD, 13));
 		btnGenerateReport.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//if(Validator.dateValidate(), getTitle()).isPresent(cmboxDate, getName()))
-			}
-		});
+				if (rdbtnAll.isSelected()) {
+					try {
+						Object[] recList;
+						recList = TextIOFile.findAll();
+						textArea.setText("");//clear data
+
+						for(Object r : recList) {
+							textArea.append(r.toString());
+							textArea.append("\n");
+						}
+					}catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+						JOptionPane.showMessageDialog(null, e1.getMessage(),"Find All", JOptionPane.ERROR_MESSAGE);
+					}
+				}
+				else if(rdbtnCity.isSelected()) {
+					String findCity="";
+					findCity = (String) cmboxCity.getSelectedItem();
+					textArea.setText("");
+					Object[] recList;
+					try {
+						recList = TextIOFile.findCity(findCity);
+						for(Object r : recList) {
+							textArea.append(r.toString());
+							textArea.append("\n");
+						}
+					}catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+						JOptionPane.showMessageDialog(null, e1.getMessage(),"Find Records for City", JOptionPane.ERROR_MESSAGE);
+					}
+				}
+				else if(rdbtnDate.isSelected()) {
+					Date date_value = datePicker.getDate();
+					DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+					String strDate= dateFormat.format(date_value);  
+					textArea.setText("");
+					
+					try {
+						Object[] recList = TextIOFile.findDate(strDate);
+						int totalcases=0;
+						int totaldeaths=0;
+						int totalrecovered=0;
+						for(Object r : recList) {
+								
+							
+							String[] fields = r.toString().split(",");
+							totalcases=totalcases+ Integer.parseInt(fields[2]);
+							totaldeaths=totaldeaths+ Integer.parseInt(fields[3]);
+							totalrecovered=totalrecovered+ Integer.parseInt(fields[4]);
+							textArea.append(r.toString());
+							textArea.append("\n");
+							}
+						textArea.append("Total no. of cases:"+totalcases+"\n");
+						textArea.append("Total no. of deaths: "+totaldeaths+"\n");
+						textArea.append("Total no. of recovered cases: "+totalrecovered);
+					}catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+						JOptionPane.showMessageDialog(null, e1.getMessage(),"Find Records by Date", JOptionPane.ERROR_MESSAGE);
+					}
+				}
+		}
+				});
 		btnGenerateReport.setBounds(29, 253, 158, 31);
 		contentPane.add(btnGenerateReport);
+		}
 	}
-}

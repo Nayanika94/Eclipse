@@ -2,7 +2,7 @@ package presentation;
 
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
-import javax.swing.text.JTextComponent;
+
 
 import com.toedter.calendar.JDateChooser;
 
