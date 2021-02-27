@@ -62,40 +62,30 @@ public class Report_GUI extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		
+		String[] choices = {"Select","Brampton", "Toronto", "Mississauga","Kitchener","Oakville","Cambridge"};
+		JComboBox cmboxCity = new JComboBox(choices);
+		cmboxCity.setBackground(UIManager.getColor("Button.background"));
+		cmboxCity.setEnabled(false);
+		cmboxCity.setBounds(37, 115, 132, 27);
+		contentPane.add(cmboxCity);
 
 		JRadioButton rdbtnAll = new JRadioButton("All");
+		
 		rdbtnAll.setSelected(true);
 		buttonGroup.add(rdbtnAll);
 		rdbtnAll.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		rdbtnAll.setBounds(37, 50, 103, 21);
 		contentPane.add(rdbtnAll);
 
-		String[] choices = {"Select","Brampton", "Toronto", "Mississauga","Kitchener","Oakville","Cambridge"};
-		JComboBox<String> cmboxCity = new JComboBox<String>(choices);
-		cmboxCity.setBackground(UIManager.getColor("Button.background"));
-		cmboxCity.setEnabled(false);
-		cmboxCity.setBounds(37, 115, 132, 27);
-		contentPane.add(cmboxCity);
-
 		JDateChooser datePicker = new JDateChooser();
 		datePicker.setDateFormatString("MM/dd/yyyy");
-		
-		datePicker.getCalendarButton().addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
 		datePicker.setBounds(37, 184, 134, 27);
 		contentPane.add(datePicker);
 
 		JRadioButton rdbtnDate = new JRadioButton("Date");
 		datePicker.setEnabled(false);
-		rdbtnDate.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(rdbtnDate.isSelected()) {
-					datePicker.setEnabled(true);
-				}
-			}
-		});
+		
 		buttonGroup.add(rdbtnDate);
 		rdbtnDate.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		rdbtnDate.setBounds(37, 148, 103, 21);
@@ -103,13 +93,7 @@ public class Report_GUI extends JFrame {
 
 		JRadioButton rdbtnCity = new JRadioButton("City");
 		cmboxCity.setEnabled(false);
-		rdbtnCity.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(rdbtnCity.isSelected()) {
-					cmboxCity.setEnabled(true);
-				}
-			}
-		});
+		
 		buttonGroup.add(rdbtnCity);
 		rdbtnCity.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		rdbtnCity.setBounds(37, 83, 103, 21);
@@ -123,12 +107,42 @@ public class Report_GUI extends JFrame {
 		JTextArea textArea = new JTextArea();
 		textArea.setBounds(368, 28, 276, 256);
 		contentPane.add(textArea);
-
-		JButton btnGenerateReport = new JButton("Generate Report");
-		btnGenerateReport.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
+		
+		rdbtnDate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(rdbtnDate.isSelected()) {
+					datePicker.setEnabled(true);
+					cmboxCity.setEnabled(false);
+					cmboxCity.setSelectedIndex(0);
+					textArea.setText("");	
+				}
 			}
 		});
+		
+		rdbtnCity.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(rdbtnCity.isSelected()) {
+					cmboxCity.setEnabled(true);
+					textArea.setText("");
+					datePicker.setEnabled(false);
+					datePicker.setDate(null);
+				}
+			}
+		});
+		
+		rdbtnAll.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(rdbtnAll.isSelected()) {
+					cmboxCity.setEnabled(false);
+					cmboxCity.setSelectedIndex(0);
+					textArea.setText("");
+					datePicker.setEnabled(false);
+					datePicker.setDate(null);
+				}
+			}
+		});
+
+		JButton btnGenerateReport = new JButton("Generate Report");
 		btnGenerateReport.setFont(new Font("Tahoma", Font.BOLD, 13));
 		btnGenerateReport.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -177,8 +191,6 @@ public class Report_GUI extends JFrame {
 						int totaldeaths=0;
 						int totalrecovered=0;
 						for(Object r : recList) {
-								
-							
 							String[] fields = r.toString().split(",");
 							totalcases=totalcases+ Integer.parseInt(fields[2]);
 							totaldeaths=totaldeaths+ Integer.parseInt(fields[3]);
