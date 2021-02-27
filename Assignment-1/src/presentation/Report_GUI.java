@@ -146,40 +146,42 @@ public class Report_GUI extends JFrame {
 		btnGenerateReport.setFont(new Font("Tahoma", Font.BOLD, 13));
 		btnGenerateReport.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String report="" ;
+				
 				if (rdbtnAll.isSelected()) {
-					try {
+					
+					try {		
 						Object[] recList;
 						recList = TextIOFile.findAll();
 						textArea.setText("");//clear data
-
-						for(Object r : recList) {
-							textArea.append(r.toString());
-							textArea.append("\n");
-						}
+						report = getReport(recList);
 					}catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 						JOptionPane.showMessageDialog(null, e1.getMessage(),"Find All", JOptionPane.ERROR_MESSAGE);
 					}
 				}
+				
+				
 				else if(rdbtnCity.isSelected()) {
+					if(Validator.isPresent(cmboxCity, "City")) {
 					String findCity="";
 					findCity = (String) cmboxCity.getSelectedItem();
 					textArea.setText("");
 					Object[] recList;
 					try {
 						recList = TextIOFile.findCity(findCity);
-						for(Object r : recList) {
-							textArea.append(r.toString());
-							textArea.append("\n");
-						}
+						report = getReport(recList);
 					}catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
-						JOptionPane.showMessageDialog(null, e1.getMessage(),"Find Records for City", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(null, e1.getMessage(),"Find Records by City", JOptionPane.ERROR_MESSAGE);
 					}
 				}
+				}
+				 
 				else if(rdbtnDate.isSelected()) {
+				    	if(Validator.dateValidate(datePicker, "Date")) {
 					Date date_value = datePicker.getDate();
 					DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 					String strDate= dateFormat.format(date_value);  
@@ -187,29 +189,43 @@ public class Report_GUI extends JFrame {
 					
 					try {
 						Object[] recList = TextIOFile.findDate(strDate);
-						int totalcases=0;
-						int totaldeaths=0;
-						int totalrecovered=0;
-						for(Object r : recList) {
-							String[] fields = r.toString().split(",");
-							totalcases=totalcases+ Integer.parseInt(fields[2]);
-							totaldeaths=totaldeaths+ Integer.parseInt(fields[3]);
-							totalrecovered=totalrecovered+ Integer.parseInt(fields[4]);
-							textArea.append(r.toString());
-							textArea.append("\n");
-							}
-						textArea.append("Total no. of cases:"+totalcases+"\n");
-						textArea.append("Total no. of deaths: "+totaldeaths+"\n");
-						textArea.append("Total no. of recovered cases: "+totalrecovered);
+						report = getReport(recList);
 					}catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 						JOptionPane.showMessageDialog(null, e1.getMessage(),"Find Records by Date", JOptionPane.ERROR_MESSAGE);
 					}
+					
 				}
-		}
-				});
+			}
+				textArea.append(report);
+	}
+		});
 		btnGenerateReport.setBounds(29, 253, 158, 31);
 		contentPane.add(btnGenerateReport);
 		}
+	private String getReport(Object[] recList) {
+		StringBuilder report = new StringBuilder();
+		if(recList.length==0) {
+			report.append("NO DATA");
+		}else {
+			int totalcases=0;
+			int totaldeaths=0;
+			int totalrecovered=0;
+			report.append("DATA RECORDS").append(System.lineSeparator());
+			for(Object r : recList) {
+				String[] fields = r.toString().split(",");
+				totalcases=totalcases+ Integer.parseInt(fields[2]);
+				totaldeaths=totaldeaths+ Integer.parseInt(fields[3]);
+				totalrecovered=totalrecovered+ Integer.parseInt(fields[4]);
+				report.append(r).append(System.lineSeparator());
+			}
+			report.append("TOTALS").append(System.lineSeparator())
+				.append("Cases: ").append(totalcases).append(';')
+				.append("Deaths: ").append(totaldeaths).append(';')
+				.append("Recovered: ").append(totalrecovered);
+			
+		}
+		return report.toString();
+	}
 	}
