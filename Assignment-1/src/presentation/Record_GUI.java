@@ -1,29 +1,18 @@
 package presentation;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import com.toedter.calendar.JDateChooser;
+import data.Data;
+import data.TextIOFile;
+
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-import javax.swing.JFormattedTextField;
-import java.awt.Font;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.awt.event.ActionEvent;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.JList;
-import javax.swing.JComboBox;
-import com.toedter.calendar.JDateChooser;
-import data.TextIOFile;
 
 public class Record_GUI extends JFrame {
 
@@ -50,7 +39,7 @@ public class Record_GUI extends JFrame {
 	 */
 	public Record_GUI() {
 		setTitle("Daily Record");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 655, 370);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -126,15 +115,21 @@ public class Record_GUI extends JFrame {
 					int recovered = (int)spinnerRecover.getValue();
 					
 					try {
-						TextIOFile.writeRecord(strDate,city,cases,deaths,recovered);
+                        Data data = new Data(strDate,city,cases,deaths,recovered);
+						TextIOFile.writeRecord(data);
 						JOptionPane.showMessageDialog(null,"Data is saved to the File");
+                        dateChooser.setDate(null);
+                        comboBox.setSelectedItem("Select");
+                        spinnerCases.setValue(0);
+                        spinnerDeaths.setValue(0);
+                        spinnerRecover.setValue(0);
 						} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						//e1.printStackTrace();
 						JOptionPane.showMessageDialog(null,"Error !" + e1.getMessage());
 						//TextFileIO.readStudents();
 					    } 
-					JOptionPane.showMessageDialog(null, strDate + "\n" + city + "\n" + cases + "\n" + deaths +"\n" + recovered);
+					//JOptionPane.showMessageDialog(null, strDate + "\n" + city + "\n" + cases + "\n" + deaths +"\n" + recovered);
 					}
 				}
 			}
